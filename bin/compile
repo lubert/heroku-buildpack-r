@@ -12,6 +12,10 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 
+function read_var() {
+  echo $(head -n 1 $1)
+}
+
 #----------------------------------------------------------------------
 
 # import supporting script
@@ -64,7 +68,14 @@ START_TIME="$(date -u +%s)"
 
 # define static vars
 BUILDPACK_NAME=heroku-buildpack-r
-R_VERSION=4.0.0
+# read in R version if file exists
+if [[ -f "$BUILD_DIR/.r-version" ]];
+then
+  R_VERSION=`read_var $BUILD_DIR/.r-version`
+  echo "NOTE: Using R version override [$R_VERSION]" | indent
+else
+  R_VERSION="3.6.3"
+fi
 
 # NB: undocumented feature ~ used for testing different versions
 # E.g. set via heroku config:set BUILDPACK_VERSION=test
